@@ -4,6 +4,7 @@ module LibFetch
     ( get, getCode, filterContent, fetchInterNews
     ) where
 
+import Data.Char (isSpace)
 import Network.HTTP
 import Data.List (isInfixOf)
 import Data.List.Split (splitOn)
@@ -19,7 +20,11 @@ getCode url = simpleHTTP req >>= getResponseCode
     where req = getRequest url
 
 filterContent :: String -> String -> String
-filterContent substr htmlAsString = unlines $ filter (\s -> isInfixOf substr s) (lines htmlAsString)
+filterContent substr htmlAsString =
+  clearTrailingNewLine $ unlines $ filter (\s -> isInfixOf substr s) (lines htmlAsString)
+
+clearTrailingNewLine :: String -> String
+clearTrailingNewLine = reverse . dropWhile isSpace . reverse
 
 fetchInterNews :: IO [String]
 fetchInterNews = do
